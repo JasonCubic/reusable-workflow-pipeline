@@ -1,0 +1,77 @@
+# https://docs.github.com/en/actions/using-workflows/reusing-workflows#example-reusable-workflow
+name: rw-azure-deploy-rg-and-stg
+
+on:
+  workflow_call:
+    inputs:
+      tenant-id:
+        description: The azure tenant id you are deploying to
+        required: true
+        type: string
+      subscription-id:
+        description: Your azure subscription id
+        required: true
+        type: string
+      resource-group-name:
+        description: The name of the resource group that the storage account will be placed into
+        required: true
+        type: string
+      storage-account-prefix:
+        description: The prefix of the storage account
+        default: storage
+        required: true
+        type: string
+      client-id:
+        description: The Azure Service Principal id with access to deploy to your subscription
+        required: true
+        type: string
+      runs-on:
+        required: false
+        default: '["ubuntu-latest"]'
+        type: string
+    secrets:
+      client-secret:
+        description: The Azure Service Principal password with access to deploy to your subscription
+        required: true
+
+jobs:
+  rw-azure-deploy-rg-and-stg:
+    name: reusable workflow that deploys a resource group with a storage account in it
+    runs-on: ${{ fromJSON(inputs.runs-on) }}
+
+    steps:
+      # - name: run a hello-world docker based GitHub Action
+      #   # https://github.com/JasonCubic/ga-hello-world
+      #   uses: JasonCubic/ga-hello-world@main
+      #   with:
+      #     who-to-greet: ${{ inputs.who-to-greet }}
+      # Checkout code
+      # $creds = New-Object System.Management.Automation.PSCredential("${{ inputs.client-id }}",("${{ secrets.client-secret }}"| ConvertTo-SecureString -asPlainText -Force))
+      # https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.security/get-credential?view=powershell-7.3
+      - name: set azure creds secret using powershell for the azure/login@v1 action
+        shell: pwsh
+        run: |
+          Write-Output "${{ inputs.client-id }}"
+          $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList "${{ inputs.client-id }}", ("abc123"| ConvertTo-SecureString -asPlainText -Force)
+          Write-Output $Credential
+
+      # - uses: actions/checkout@main
+
+      # #
+      # # Disconnect-AzAccount
+      # # Connect-AzAccount -ServicePrincipal -Tenant $env:Tenant -Credential $creds -Subscription $env:SubID
+
+      # # Log into Azure
+      # - uses: azure/login@v1
+      #   with:
+      #     creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      #   # Deploy Bicep file
+      # - name: deploy
+      #   uses: azure/arm-deploy@v1
+      #   with:
+      #     subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
+      #     resourceGroupName: ${{ secrets.AZURE_RG }}
+      #     template: ./main.bicep
+      #     parameters: "storagePrefix=mystore storageSKU=Standard_LRS"
+      #     failOnStdErr: true
