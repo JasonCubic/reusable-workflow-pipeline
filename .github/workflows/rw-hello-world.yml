@@ -6,18 +6,19 @@ on:
     inputs:
       runs-on:
         required: false
-        default: ubuntu-latest
+        default: '["ubuntu-latest"]'
         type: string
       who-to-greet:
-        description: "Who to greet"
+        description: Who to greet
         required: false
-        default: "World"
+        default: World
         type: string
 
 jobs:
   rw-hello-world:
     name: reusable workflow hello world
-    runs-on: ${{ inputs.runs-on }}
+    runs-on: ${{ fromJSON(inputs.runs-on) }}
+    # runs-on: ${{ inputs.runs-on }}
 
     steps:
       - name: run a hello-world docker based GitHub Action
