@@ -19,7 +19,7 @@ on:
       storage-account-prefix:
         description: The prefix of the storage account
         default: storage
-        required: true
+        required: false
         type: string
       client-id:
         description: The Azure Service Principal id with access to deploy to your subscription
