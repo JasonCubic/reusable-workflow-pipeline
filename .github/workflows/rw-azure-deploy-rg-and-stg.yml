@@ -51,10 +51,10 @@ jobs:
           ref: main
           path: ./.github/actions/reusable-workflow-pipeline
 
-      - name: check clone
-        run: |
-          pwd
-          ls -al ./.github/actions/reusable-workflow-pipeline
+      # - name: check clone
+      #   run: |
+      #     pwd
+      #     ls -al ./.github/actions/reusable-workflow-pipeline
 
       # note: can put in things like custom validation actions here to make sure values are set correctly
 
@@ -62,15 +62,15 @@ jobs:
       - uses: Azure/login@v1
         with:
           creds: '{"clientId":"${{ secrets.client-id }}","clientSecret":"${{ secrets.client-secret }}","subscriptionId":"${{ secrets.subscription-id }}","tenantId":"${{ secrets.tenant-id }}"}'
-          enable-AzPSSession: true
+          # enable-AzPSSession: true
 
-      - name: pwsh az check connection
-        uses: azure/powershell@v1
-        with:
-          inlineScript: |
-            Get-AzContext
-            Get-AzResourceGroup
-          azPSVersion: latest
+      # - name: pwsh az check connection
+      #   uses: azure/powershell@v1
+      #   with:
+      #     inlineScript: |
+      #       Get-AzContext
+      #       Get-AzResourceGroup
+      #     azPSVersion: latest
 
       - name: deploy azure resource group to subscription
         uses: azure/arm-deploy@v1
