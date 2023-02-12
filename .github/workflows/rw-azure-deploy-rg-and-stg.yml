@@ -42,15 +42,21 @@ jobs:
     runs-on: ${{ fromJSON(inputs.runs-on) }}
 
     steps:
-      # Checkout code
-      - uses: actions/checkout@v3
+      # remember that this does not run in this repo, it runs in the client repo
+      - name: Check out repository
+        uses: actions/checkout@v3
+        with:
+          # github-server-url: https://git.t3.daimlertruck.com
+          repository: JasonCubic/reusable-workflow-pipeline
+          ref: main
+          path: ./.github/actions/reusable-workflow-pipeline
 
       - name: check clone
         run: |
           pwd
-          ls -al
+          ls -al ./.github/actions/reusable-workflow-pipeline
 
-      # note: can put in things like validation actions here
+      # note: can put in things like custom validation actions here to make sure values are set correctly
 
       # Log into Azure
       - uses: Azure/login@v1
@@ -72,7 +78,7 @@ jobs:
           scope: subscription
           region: ${{ inputs.location }}
           subscriptionId: ${{ secrets.subscription-id }}
-          template: main.bicep
+          template: ./.github/actions/reusable-workflow-pipeline/main.bicep
           parameters: "location=${{ inputs.location }} resourceGroupName=${{ inputs.resource-group-name }}"
           failOnStdErr: true
 
@@ -82,7 +88,7 @@ jobs:
           scope: resourcegroup
           subscriptionId: ${{ secrets.subscription-id }}
           resourceGroupName: ${{ inputs.resource-group-name }}
-          template: storage.bicep
+          template: ./.github/actions/reusable-workflow-pipeline/storage.bicep
           parameters: "location=${{ inputs.location }} namePrefix=${{ inputs.storage-account-prefix }}"
           deploymentMode: Complete
           failOnStdErr: true
