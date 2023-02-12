@@ -4,7 +4,7 @@ name: rw-hello-world
 on:
   workflow_call:
     inputs:
-      RUNS_ON:
+      runs-on:
         required: false
         default: ubuntu-latest
         type: string
@@ -17,7 +17,7 @@ on:
 jobs:
   rw-hello-world:
     name: reusable workflow hello world
-    runs-on: ${{ inputs.RUNS_ON }}
+    runs-on: ${{ inputs.runs-on }}
 
     steps:
       - name: run a hello-world docker based GitHub Action
