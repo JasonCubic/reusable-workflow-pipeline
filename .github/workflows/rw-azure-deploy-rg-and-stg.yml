@@ -4,14 +4,6 @@ name: rw-azure-deploy-rg-and-stg
 on:
   workflow_call:
     inputs:
-      tenant-id:
-        description: The azure tenant id you are deploying to
-        required: true
-        type: string
-      subscription-id:
-        description: Your azure subscription id
-        required: true
-        type: string
       resource-group-name:
         description: The name of the resource group that the storage account will be placed into
         required: true
@@ -21,15 +13,25 @@ on:
         default: storage
         required: false
         type: string
-      client-id:
-        description: The Azure Service Principal id with access to deploy to your subscription
-        required: true
+      location:
+        description: The azure location/region to deploy the resources into
+        default: westus3
+        required: false
         type: string
       runs-on:
         required: false
         default: '["ubuntu-latest"]'
         type: string
     secrets:
+      tenant-id:
+        description: The azure tenant id you are deploying to
+        required: true
+      subscription-id:
+        description: Your azure subscription id
+        required: true
+      client-id:
+        description: The Azure Service Principal id with access to deploy to your subscription
+        required: true
       client-secret:
         description: The Azure Service Principal password with access to deploy to your subscription
         required: true
@@ -40,57 +42,38 @@ jobs:
     runs-on: ${{ fromJSON(inputs.runs-on) }}
 
     steps:
-      # - name: run a hello-world docker based GitHub Action
-      #   # https://github.com/JasonCubic/ga-hello-world
-      #   uses: JasonCubic/ga-hello-world@main
-      #   with:
-      #     who-to-greet: ${{ inputs.who-to-greet }}
       # Checkout code
-      # $creds = New-Object System.Management.Automation.PSCredential("${{ inputs.client-id }}",("${{ secrets.client-secret }}"| ConvertTo-SecureString -asPlainText -Force))
-      # https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.security/get-credential?view=powershell-7.3
-      # - name: set azure creds secret using powershell for the azure/login@v1 action
-      #   shell: pwsh
-      #   run: |
-      #     Write-Output "${{ inputs.client-id }}"
-      #     $clientSecretSecureString = "abc123"| ConvertTo-SecureString -asPlainText -Force
-      #     $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList "${{ inputs.client-id }}", ("abc123"| ConvertTo-SecureString -asPlainText -Force)
-      #     Write-Output $Credential
-      #     Write-Output "AZURE_CREDENTIALS=$Credential"
-      #     "AZURE_CREDENTIALS=$Credential" >> $env:GITHUB_ENV
+      - uses: actions/checkout@v3
 
-      # - name: test if it made it to ga env
-      #   run: echo '{"clientId":"${{ secrets.CLIENT_ID }}","clientSecret":"${{ secrets.CLIENT_SECRET }}","subscriptionId":"${{ secrets.SUBSCRIPTION_ID }}","tenantId":"${{ secrets.TENANT_ID }}"}'
-
-      # - uses: actions/checkout@main
-
-      # #
-      # # Disconnect-AzAccount
-      # # Connect-AzAccount -ServicePrincipal -Tenant $env:Tenant -Credential $creds -Subscription $env:SubID
-
-      # - uses: azure/login@v1
-      #   with:
-      #     creds: ${{ secrets.AZURE_CREDENTIALS }}
+      # note: can put in things like validation actions here
 
       # Log into Azure
       - uses: Azure/login@v1
         with:
-          creds: '{"clientId":"${{ inputs.client-id }}","clientSecret":"${{ secrets.client-secret }}","subscriptionId":"${{ inputs.subscription-id }}","tenantId":"${{ inputs.tenant-id }}"}'
+          creds: '{"clientId":"${{ secrets.client-id }}","clientSecret":"${{ secrets.client-secret }}","subscriptionId":"${{ secrets.subscription-id }}","tenantId":"${{ secrets.tenant-id }}"}'
           enable-AzPSSession: true
 
-      - name: test az
+      - name: pwsh az check connection
         uses: azure/powershell@v1
         with:
           inlineScript: |
             Get-AzContext
             Get-AzResourceGroup
-          azPSVersion: "latest"
+          azPSVersion: latest
 
-      #   # Deploy Bicep file
-      # - name: deploy
-      #   uses: azure/arm-deploy@v1
-      #   with:
-      #     subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
-      #     resourceGroupName: ${{ secrets.AZURE_RG }}
-      #     template: ./main.bicep
-      #     parameters: "storagePrefix=mystore storageSKU=Standard_LRS"
-      #     failOnStdErr: true
+      - name: deploy azure resource group to subscription
+        uses: azure/arm-deploy@v1
+        with:
+          subscriptionId: ${{ secrets.subscription-id }}
+          template: ./main.bicep
+          parameters: "location=${{ inputs.location }} resourceGroupName=${{ inputs.resource-group-name }}"
+          failOnStdErr: true
+
+      - name: deploy azure storage account to resource group
+        uses: azure/arm-deploy@v1
+        with:
+          subscriptionId: ${{ secrets.subscription-id }}
+          resourceGroupName: ${{ secrets.resource-group-name }}
+          template: ./storage.bicep
+          parameters: "location=${{ inputs.location }} namePrefix=${{ inputs.storage-account-prefix }}"
+          failOnStdErr: true
