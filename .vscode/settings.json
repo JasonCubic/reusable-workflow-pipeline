@@ -1,0 +1,9 @@
+{
+  "[yaml]": {
+    "editor.formatOnSave": true
+  },
+  "eslint.format.enable": true,
+  "grammarly.files.exclude": [
+    "**/*.md"
+  ]
+}
