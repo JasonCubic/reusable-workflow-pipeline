@@ -36,6 +36,11 @@ on:
         description: The Azure Service Principal password with access to deploy to your subscription
         required: true
 
+# Allow one concurrent deployment
+concurrency:
+  group: rw-azure-deploy-rg-and-stg
+  cancel-in-progress: true
+
 jobs:
   rw-azure-deploy-rg-and-stg:
     name: reusable workflow that deploys a resource group with a storage account in it
@@ -75,6 +80,7 @@ jobs:
       - name: deploy azure resource group to subscription
         uses: azure/arm-deploy@v1
         with:
+          deploymentName: ga-deploy-sub-${{ env.GITHUB_REPOSITORY }}-${{ env.GITHUB_RUN_NUMBER }}
           scope: subscription
           region: ${{ inputs.location }}
           subscriptionId: ${{ secrets.subscription-id }}
@@ -85,6 +91,7 @@ jobs:
       - name: deploy azure storage account to resource group
         uses: azure/arm-deploy@v1
         with:
+          deploymentName: ga-deploy-rg-${{ env.GITHUB_REPOSITORY }}-${{ env.GITHUB_RUN_NUMBER }}
           scope: resourcegroup
           subscriptionId: ${{ secrets.subscription-id }}
           resourceGroupName: ${{ inputs.resource-group-name }}
