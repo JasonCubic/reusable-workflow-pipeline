@@ -75,6 +75,15 @@ jobs:
       - uses: Azure/login@v1
         with:
           creds: '{"clientId":"${{ inputs.client-id }}","clientSecret":"${{ secrets.client-secret }}","subscriptionId":"${{ inputs.subscription-id }}","tenantId":"${{ inputs.tenant-id }}"}'
+          enable-AzPSSession: true
+
+      - name: test az
+        uses: azure/powershell@v1
+        with:
+          inlineScript: |
+            Get-AzContext
+            Get-AzResourceGroup
+          azPSVersion: "latest"
 
       #   # Deploy Bicep file
       # - name: deploy
