@@ -32,16 +32,13 @@ jobs:
           echo "docker-compose build . <add settings and args here>"
           echo "docker tag <tag1 as it was built> <tag1 to use for the image repository>"
           echo "docker tag <tag2 as it was built> <tag2 to use for the image repository>"
-          echo "docker tag <tag3 as it was built> <tag3 to use for the image repository>"
+          echo "docker tag <tag3... as it was built> <tag3... to use for the image repository>"
           echo "docker login stuff"
           echo "docker push <tag1>"
           echo "docker push <tag2>"
-          echo "docker push <tag3>"
+          echo "docker push <tag3...>"
           echo "docker logout"
           echo "clean up after the work using 'docker container prune -f' or something like that"
-
-
-
 
 
   #  GitHub Actions reusable workflows https://docs.github.com/en/actions/using-workflows/reusing-workflows#example-caller-workflow
