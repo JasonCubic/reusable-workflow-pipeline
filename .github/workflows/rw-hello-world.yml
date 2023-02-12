@@ -8,14 +8,20 @@ on:
         required: false
         default: ubuntu-latest
         type: string
+      who-to-greet:
+        description: "Who to greet"
+        required: false
+        default: "World"
+        type: string
 
 jobs:
   rw-hello-world:
     name: reusable workflow hello world
     runs-on: ${{ inputs.RUNS_ON }}
-    # runs-on: ubuntu-latest
 
     steps:
-      - name: run GitHub Action from a GitHub Repo
+      - name: run a hello-world docker based GitHub Action
         # https://github.com/JasonCubic/ga-hello-world
         uses: JasonCubic/ga-hello-world@main
+        with:
+          who-to-greet: ${{ inputs.who-to-greet }}
