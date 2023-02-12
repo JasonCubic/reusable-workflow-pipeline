@@ -65,6 +65,7 @@ jobs:
         uses: azure/arm-deploy@v1
         with:
           subscriptionId: ${{ secrets.subscription-id }}
+          resourceGroupName: ${{ inputs.resource-group-name }}
           template: ./main.bicep
           parameters: "location=${{ inputs.location }} resourceGroupName=${{ inputs.resource-group-name }}"
           failOnStdErr: true
@@ -73,7 +74,7 @@ jobs:
         uses: azure/arm-deploy@v1
         with:
           subscriptionId: ${{ secrets.subscription-id }}
-          resourceGroupName: ${{ secrets.resource-group-name }}
+          resourceGroupName: ${{ inputs.resource-group-name }}
           template: ./storage.bicep
           parameters: "location=${{ inputs.location }} namePrefix=${{ inputs.storage-account-prefix }}"
           failOnStdErr: true
