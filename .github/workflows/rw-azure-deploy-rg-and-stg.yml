@@ -53,6 +53,7 @@ jobs:
         run: |
           Write-Output "${{ inputs.client-id }}"
           $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList "${{ inputs.client-id }}", ("abc123"| ConvertTo-SecureString -asPlainText -Force)
+          Write-Output $Credential
           Write-Output "AZURE_CREDENTIALS=$Credential"
           "AZURE_CREDENTIALS=$Credential" >> $env:GITHUB_ENV
 
