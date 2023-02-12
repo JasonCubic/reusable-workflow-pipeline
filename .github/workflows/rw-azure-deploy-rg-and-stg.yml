@@ -64,8 +64,9 @@ jobs:
       - name: deploy azure resource group to subscription
         uses: azure/arm-deploy@v1
         with:
+          scope: subscription
+          region: ${{ inputs.location }}
           subscriptionId: ${{ secrets.subscription-id }}
-          resourceGroupName: ${{ inputs.resource-group-name }}
           template: ./main.bicep
           parameters: "location=${{ inputs.location }} resourceGroupName=${{ inputs.resource-group-name }}"
           failOnStdErr: true
@@ -73,8 +74,10 @@ jobs:
       - name: deploy azure storage account to resource group
         uses: azure/arm-deploy@v1
         with:
+          scope: resourcegroup
           subscriptionId: ${{ secrets.subscription-id }}
           resourceGroupName: ${{ inputs.resource-group-name }}
           template: ./storage.bicep
           parameters: "location=${{ inputs.location }} namePrefix=${{ inputs.storage-account-prefix }}"
+          deploymentMode: Complete
           failOnStdErr: true
