@@ -48,17 +48,18 @@ jobs:
       # Checkout code
       # $creds = New-Object System.Management.Automation.PSCredential("${{ inputs.client-id }}",("${{ secrets.client-secret }}"| ConvertTo-SecureString -asPlainText -Force))
       # https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.security/get-credential?view=powershell-7.3
-      - name: set azure creds secret using powershell for the azure/login@v1 action
-        shell: pwsh
-        run: |
-          Write-Output "${{ inputs.client-id }}"
-          $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList "${{ inputs.client-id }}", ("abc123"| ConvertTo-SecureString -asPlainText -Force)
-          Write-Output $Credential
-          Write-Output "AZURE_CREDENTIALS=$Credential"
-          "AZURE_CREDENTIALS=$Credential" >> $env:GITHUB_ENV
+      # - name: set azure creds secret using powershell for the azure/login@v1 action
+      #   shell: pwsh
+      #   run: |
+      #     Write-Output "${{ inputs.client-id }}"
+      #     $clientSecretSecureString = "abc123"| ConvertTo-SecureString -asPlainText -Force
+      #     $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList "${{ inputs.client-id }}", ("abc123"| ConvertTo-SecureString -asPlainText -Force)
+      #     Write-Output $Credential
+      #     Write-Output "AZURE_CREDENTIALS=$Credential"
+      #     "AZURE_CREDENTIALS=$Credential" >> $env:GITHUB_ENV
 
-      - name: test if it made it to ga env
-        run: echo $AZURE_CREDENTIALS
+      # - name: test if it made it to ga env
+      #   run: echo '{"clientId":"${{ secrets.CLIENT_ID }}","clientSecret":"${{ secrets.CLIENT_SECRET }}","subscriptionId":"${{ secrets.SUBSCRIPTION_ID }}","tenantId":"${{ secrets.TENANT_ID }}"}'
 
       # - uses: actions/checkout@main
 
@@ -66,10 +67,14 @@ jobs:
       # # Disconnect-AzAccount
       # # Connect-AzAccount -ServicePrincipal -Tenant $env:Tenant -Credential $creds -Subscription $env:SubID
 
-      # # Log into Azure
       # - uses: azure/login@v1
       #   with:
       #     creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Log into Azure
+      - uses: Azure/login@v1
+        with:
+          creds: '{"clientId":"${{ inputs.client-id }}","clientSecret":"${{ secrets.client-secret }}","subscriptionId":"${{ inputs.subscription-id }}","tenantId":"${{ inputs.tenant-id }}"}'
 
       #   # Deploy Bicep file
       # - name: deploy
