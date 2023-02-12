@@ -3,17 +3,17 @@ name: rw-hello-world
 
 on:
   workflow_call:
-    # inputs:
-    #   RUNS_ON:
-    #     required: false
-    #     default: ubuntu-latest
-    #     type: string
+    inputs:
+      RUNS_ON:
+        required: false
+        default: ubuntu-latest
+        type: string
 
 jobs:
   rw-hello-world:
     name: reusable workflow hello world
-    # runs-on: ${{ inputs.RUNS_ON }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.RUNS_ON }}
+    # runs-on: ubuntu-latest
 
     steps:
       - name: run GitHub Action from a GitHub Repo
