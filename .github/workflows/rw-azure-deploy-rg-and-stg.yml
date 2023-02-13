@@ -82,6 +82,7 @@ jobs:
           subscriptionId: ${{ secrets.subscription-id }}
           template: ./.github/actions/reusable-workflow-pipeline/main.bicep
           parameters: "location=${{ inputs.location }} rgName=${{ inputs.resource-group-name }} stNamePrefix=${{ inputs.storage-account-prefix }}"
+          deploymentMode: Complete
           failOnStdErr: true
 
       # - name: deploy azure storage account to resource group
