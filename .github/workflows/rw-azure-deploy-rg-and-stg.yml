@@ -18,6 +18,10 @@ on:
         default: westus3
         required: false
         type: string
+      deployment-mode:
+        required: false
+        default: Incremental
+        type: string
       runs-on:
         required: false
         default: '["ubuntu-latest"]'
@@ -81,18 +85,18 @@ jobs:
           region: ${{ inputs.location }}
           subscriptionId: ${{ secrets.subscription-id }}
           template: ./.github/actions/reusable-workflow-pipeline/main.bicep
-          parameters: "location=${{ inputs.location }} rgName=${{ inputs.resource-group-name }} stNamePrefix=${{ inputs.storage-account-prefix }}"
-          deploymentMode: Complete
+          parameters: "location=${{ inputs.location }} rgName=${{ inputs.resource-group-name }}"
+          deploymentMode: ${{ inputs.deployment-mode }}
           failOnStdErr: true
 
-      # - name: deploy azure storage account to resource group
-      #   uses: azure/arm-deploy@v1
-      #   with:
-      #     deploymentName: ga-deploy-rg-${{ env.GITHUB_REPOSITORY }}-${{ env.GITHUB_RUN_NUMBER }}
-      #     scope: resourcegroup
-      #     subscriptionId: ${{ secrets.subscription-id }}
-      #     resourceGroupName: ${{ inputs.resource-group-name }}
-      #     template: ./.github/actions/reusable-workflow-pipeline/storage.bicep
-      #     parameters: "location=${{ inputs.location }} namePrefix=${{ inputs.storage-account-prefix }}"
-      #     deploymentMode: Complete
-      #     failOnStdErr: true
+      - name: deploy azure storage account to resource group
+        uses: azure/arm-deploy@v1
+        with:
+          deploymentName: ga-deploy-rg-${{ env.GITHUB_REPOSITORY }}-${{ env.GITHUB_RUN_NUMBER }}
+          scope: resourcegroup
+          subscriptionId: ${{ secrets.subscription-id }}
+          resourceGroupName: ${{ inputs.resource-group-name }}
+          template: ./.github/actions/reusable-workflow-pipeline/storage.bicep
+          parameters: "location=${{ inputs.location }} namePrefix=${{ inputs.storage-account-prefix }}"
+          deploymentMode: ${{ inputs.deployment-mode }}
+          failOnStdErr: true
