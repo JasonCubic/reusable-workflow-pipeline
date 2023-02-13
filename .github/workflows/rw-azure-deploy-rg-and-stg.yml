@@ -47,7 +47,7 @@ jobs:
     runs-on: ${{ fromJSON(inputs.runs-on) }}
 
     steps:
-      # remember that this does not run in this repo, it runs in the client repo
+      # clones this repo.  Remember that this does not run in this repo, it runs a client repo.
       - name: Check out repository
         uses: actions/checkout@v3
         with:
@@ -55,11 +55,6 @@ jobs:
           repository: JasonCubic/reusable-workflow-pipeline
           ref: main
           path: ./.github/actions/reusable-workflow-pipeline
-
-      # - name: check clone
-      #   run: |
-      #     pwd
-      #     ls -al ./.github/actions/reusable-workflow-pipeline
 
       # note: can put in things like custom validation actions here to make sure values are set correctly
 
@@ -77,6 +72,7 @@ jobs:
       #       Get-AzResourceGroup
       #     azPSVersion: latest
 
+      # https://github.com/Azure/arm-deploy
       - name: deploy azure resource group to subscription
         uses: azure/arm-deploy@v1
         with:
@@ -85,17 +81,17 @@ jobs:
           region: ${{ inputs.location }}
           subscriptionId: ${{ secrets.subscription-id }}
           template: ./.github/actions/reusable-workflow-pipeline/main.bicep
-          parameters: "location=${{ inputs.location }} resourceGroupName=${{ inputs.resource-group-name }}"
+          parameters: "location=${{ inputs.location }} rgName=${{ inputs.resource-group-name }} stNamePrefix=${{ inputs.storage-account-prefix }}"
           failOnStdErr: true
 
-      - name: deploy azure storage account to resource group
-        uses: azure/arm-deploy@v1
-        with:
-          deploymentName: ga-deploy-rg-${{ env.GITHUB_REPOSITORY }}-${{ env.GITHUB_RUN_NUMBER }}
-          scope: resourcegroup
-          subscriptionId: ${{ secrets.subscription-id }}
-          resourceGroupName: ${{ inputs.resource-group-name }}
-          template: ./.github/actions/reusable-workflow-pipeline/storage.bicep
-          parameters: "location=${{ inputs.location }} namePrefix=${{ inputs.storage-account-prefix }}"
-          deploymentMode: Complete
-          failOnStdErr: true
+      # - name: deploy azure storage account to resource group
+      #   uses: azure/arm-deploy@v1
+      #   with:
+      #     deploymentName: ga-deploy-rg-${{ env.GITHUB_REPOSITORY }}-${{ env.GITHUB_RUN_NUMBER }}
+      #     scope: resourcegroup
+      #     subscriptionId: ${{ secrets.subscription-id }}
+      #     resourceGroupName: ${{ inputs.resource-group-name }}
+      #     template: ./.github/actions/reusable-workflow-pipeline/storage.bicep
+      #     parameters: "location=${{ inputs.location }} namePrefix=${{ inputs.storage-account-prefix }}"
+      #     deploymentMode: Complete
+      #     failOnStdErr: true
