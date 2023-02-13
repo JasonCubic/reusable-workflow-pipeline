@@ -66,15 +66,7 @@ jobs:
       - uses: Azure/login@v1
         with:
           creds: '{"clientId":"${{ secrets.client-id }}","clientSecret":"${{ secrets.client-secret }}","subscriptionId":"${{ secrets.subscription-id }}","tenantId":"${{ secrets.tenant-id }}"}'
-          # enable-AzPSSession: true
-
-      # - name: pwsh az check connection
-      #   uses: azure/powershell@v1
-      #   with:
-      #     inlineScript: |
-      #       Get-AzContext
-      #       Get-AzResourceGroup
-      #     azPSVersion: latest
+          enable-AzPSSession: true
 
       # https://github.com/Azure/arm-deploy
       - name: deploy azure resource group to subscription
@@ -97,6 +89,13 @@ jobs:
           subscriptionId: ${{ secrets.subscription-id }}
           resourceGroupName: ${{ inputs.resource-group-name }}
           template: ./.github/actions/reusable-workflow-pipeline/storage.bicep
-          parameters: "location=${{ inputs.location }} namePrefix=${{ inputs.storage-account-prefix }}"
+          parameters: "location=${{ inputs.location }} stNamePrefix=${{ inputs.storage-account-prefix }}"
           deploymentMode: ${{ inputs.deployment-mode }}
           failOnStdErr: true
+
+      - name: powershell Get-AzResourceGroup
+        uses: azure/powershell@v1
+        with:
+          inlineScript: |
+            Get-AzResourceGroup
+          azPSVersion: latest
